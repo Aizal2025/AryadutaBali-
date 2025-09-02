@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hotel Booking with Map</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <ul>
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="about.html">📄 About</a></li>
+      <li><a href="form.html"> 📄Form</a></li>
+      <li><a href="help.html">⚙Services</a></li>
+      <li><a href="contact.html">📞 Contact</a></li>
+    </ul>
+  </div>
+
+  <!-- Toggle button -->
+  <div class="toggle-btn" id="toggleBtn">☰</div>
+
+  <div class="shell">
+    <!-- FORM SIDE -->
+    <div class="left">
+      <div class="branding">
+        <h1>Hotel Booking</h1>
+        <span class="small">Select hotel location on the map →</span>
+      </div>
+      <br>
+      <form id="bookingForm">
+        <div class="grid">
+          <div class="field full">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" placeholder="Aryan Kumar" required />
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" required />
+          </div>
+
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" name="phone" placeholder="+91 98765 43210" required />
+          </div>
+
+          <div class="field">
+            <label for="checkin">Check-in</label>
+            <input type="date" id="checkin" name="checkin" required />
+          </div>
+
+          <div class="field">
+            <label for="checkout">Check-out</label>
+            <input type="date" id="checkout" name="checkout" required />
+          </div>
+
+          <div class="field">
+            <label for="guests">Guests</label>
+            <input type="number" id="guests" name="guests" min="1" max="20" value="2" required />
+          </div>
+
+          <div class="field">
+            <label for="room">Room Type</label>
+            <select id="room" name="room" required>
+              <option value="">Select Room Type</option>
+              <option>Single Room</option>
+              <option>Double Room</option>
+              <option>Deluxe Room</option>
+              <option>Suite</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <label for="requests">Special Requests</label>
+            <textarea id="requests" name="requests" placeholder="Late check-in, extra pillows, etc."></textarea>
+          </div>
+
+          <!-- Coordinates (auto-filled by map) -->
+          <div class="field">
+            <label for="lat">Latitude</label>
+            <input type="text" id="lat" name="lat" placeholder="Click map" readonly />
+          </div>
+          <div class="field">
+            <label for="lng">Longitude</label>
+            <input type="text" id="lng" name="lng" placeholder="Click map" readonly />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn outline" id="locateBtn">Use My Location</button>
+          <button type="submit" class="btn">Book Now</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- MAP SIDE -->
+    <div class="right">
+      <div class="map-toolbar">
+        <div class="chip">Click the map to set hotel location</div>
+      </div>
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script>
+    const defaultCenter = [20.5937, 78.9629]; // India centroid
+    const map = L.map('map').setView(defaultCenter, 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = L.marker(defaultCenter, { draggable: true }).addTo(map);
+
+    function setLatLngFields(latlng) {
+      document.getElementById('lat').value = latlng.lat.toFixed(6);
+      document.getElementById('lng').value = latlng.lng.toFixed(6);
+    }
+    setLatLngFields(marker.getLatLng());
+
+    map.on('click', (e) => {
+      marker.setLatLng(e.latlng);
+      setLatLngFields(e.latlng);
+    });
+
+    marker.on('dragend', () => setLatLngFields(marker.getLatLng()));
+
+    document.getElementById('locateBtn').addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser.');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const here = [pos.coords.latitude, pos.coords.longitude];
+          map.setView(here, 14);
+          marker.setLatLng(here);
+          setLatLngFields(marker.getLatLng());
+        },
+        (err) => alert('Unable to retrieve your location: ' + err.message),
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    });
+
+    document.getElementById('bookingForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const checkin = document.getElementById('checkin').value;
+      const checkout = document.getElementById('checkout').value;
+
+      if (checkin && checkout && new Date(checkin) >= new Date(checkout)) {
+        alert('Check-out date must be after check-in date.');
+        return;
+      }
+
+      alert('✅ Booking submitted! Check console for data.');
+      console.log(Object.fromEntries(new FormData(e.target).entries()));
+      e.target.reset();
+    });
+
+    // Sidebar toggle
+    document.getElementById('toggleBtn').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('active');
+    });
+  </script>
+</body>
+</html>

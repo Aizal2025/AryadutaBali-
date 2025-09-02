@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Hotel Quiz — MCQ</title>
+<style>
+  :root{
+    --bg1:#1a237e;
+    --bg2:#3949ab;
+    --accent:#ffeb3b;
+    --card:rgba(255,255,255,.14);
+    --text:#ffffff;
+    --muted:#e7e7ff;
+    --correct:#1b5e20;
+    --wrong:#b71c1c;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    color:var(--text);
+    background:linear-gradient(135deg,var(--bg1),var(--bg2)) fixed;
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+  }
+  header{
+    width:100%; text-align:center; padding:28px 16px;
+  }
+  header h1{ margin:0 0 6px; font-size:clamp(22px,4vw,34px); text-shadow:0 6px 24px rgba(0,0,0,.35) }
+  header p{ margin:0; opacity:.9 }
+  .shell{
+    width:min(1000px,92vw); margin:18px auto 32px;
+    display:grid; grid-template-columns: 1fr; gap:16px;
+  }
+  .hud{
+    display:grid; grid-template-columns: 1fr auto; gap:12px; align-items:center
+  }
+  .pill, .btn{
+    border-radius:999px;
+    background:var(--card);
+    backdrop-filter: blur(10px);
+    box-shadow:0 8px 24px rgba(0,0,0,.25) inset, 0 8px 24px rgba(0,0,0,.25);
+    padding:10px 14px; font-weight:600;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .timer{ font-variant-numeric: tabular-nums; }
+  .progress{
+    height:10px; background:rgba(255,255,255,.18); border-radius:999px; overflow:hidden;
+  }
+  .bar{height:100%; width:0%; background:var(--accent); transition:width .3s ease}
+  .card{
+    background:var(--card); backdrop-filter:blur(12px);
+    border-radius:18px; padding:20px;
+    box-shadow:0 14px 40px rgba(0,0,0,.35);
+    transition:transform .2s ease;
+  }
+  .q-text{ font-size:clamp(18px,2.8vw,22px); color:var(--muted); margin:6px 0 14px; }
+  .opts{ display:grid; gap:12px; margin-top:8px; }
+  .opt{
+    border:1px solid rgba(255,255,255,.18); border-radius:14px; padding:14px 14px;
+    background:rgba(255,255,255,.10);
+    cursor:pointer; transition:transform .06s ease, border .2s ease, background .2s ease;
+  }
+  .opt:hover{ transform:translateY(-1px) }
+  .opt.selected{ border-color:var(--accent); background:rgba(255,255,0,.11) }
+  .opt.correct{ border-color:#66bb6a; background:rgba(102,187,106,.15) }
+  .opt.wrong{ border-color:#ef5350; background:rgba(239,83,80,.15) }
+  .explain{
+    margin-top:14px; font-size:14px; color:#f5f5f5; display:none;
+  }
+  .explain.show{ display:block }
+  .controls{
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; margin-top:14px
+  }
+  .btn{
+    border:none; color:#0b102e; background:var(--accent); cursor:pointer; padding:12px 18px;
+    box-shadow:0 10px 24px rgba(0,0,0,.25); transition:transform .08s ease, filter .2s ease;
+  }
+  .btn:active{ transform:translateY(1px) }
+  .btn.secondary{ background:rgba(255,255,255,.16); color:#fff }
+  .btn.ghost{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.35) }
+  .meta{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+  }
+  .footer{
+    padding:20px; text-align:center; opacity:.8; margin-top:auto; font-size:13px
+  }
+  /* Modal */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,.45);
+    display:none; place-items:center; z-index:10;
+  }
+  .modal{ width:min(560px,92vw); background:#0f1442; color:#fff; border-radius:18px; padding:22px; box-shadow:0 18px 48px rgba(0,0,0,.6) }
+  .modal h2{ margin:0 0 10px }
+  .score-big{ font-size:40px; font-weight:800; margin:8px 0 14px }
+  .tag{ padding:4px 10px; border-radius:999px; background:rgba(255,255,255,.14); display:inline-block; margin-right:8px }
+  @media (min-width:900px){
+    .shell{ grid-template-columns: 1.1fr .9fr }
+  }
+  /* Topic image */
+  .topic{
+    height:100%; background:radial-gradient(60% 60% at 50% 30%, rgba(255,255,255,.18), rgba(255,255,255,.04) 70%), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200&auto=format&fit=crop') center/cover no-repeat;
+    border-radius:18px; box-shadow:0 14px 40px rgba(0,0,0,.35);
+    display:flex; align-items:end; justify-content:start; padding:18px;
+  }
+  .topic h3{ margin:0; background:rgba(0,0,0,.45); padding:8px 12px; border-radius:12px; }
+</style>
+
+</head>
+<body>
+
+  
+  <header>
+    <h1>Hotel & Hospitality — MCQ Quiz</h1>
+    <p>Test your basics: booking, check-in, policy, amenities & service.</p>
+  </header>
+  <main class="shell">
+    <!-- Left: Quiz -->
+    <section class="card">
+      <div class="hud">
+        <div class="meta">
+          <span class="pill">Q: <b id="idx">1</b>/<span id="total">10</span></span>
+          <span class="pill">Score: <b id="score">0</b></span>
+          <span class="pill timer" id="timer">10:00</span>
+        </div>
+        <div style="min-width:180px; flex:1">
+          <div class="progress" aria-label="Progress"><div class="bar" id="bar"></div></div>
+        </div>
+      </div>
+
+      <h2 class="q-text" id="qtext">Loading…</h2>
+      <div class="opts" id="opts"></div>
+
+      <div class="explain" id="explain"></div>
+
+      <div class="controls">
+        <div style="display:flex; gap:10px">
+          <button class="btn secondary" id="prev">◀ Prev</button>
+          <button class="btn secondary" id="next">Next ▶</button>
+        </div>
+        <div style="display:flex; gap:10px">
+          <button class="btn ghost" id="reviewBtn" disabled>Review Mode</button>
+          <button class="btn" id="submitBtn">Submit Quiz</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Topic / Help -->
+    <aside class="topic">
+      <h3>Topic: Front Office & Guest Experience</h3>
+    </aside>
+  </main>
+
+  <div class="footer">© 2025 Luxury Hotel — Quiz Module</div>
+
+  <!-- Result Modal -->
+  <div class="modal-backdrop" id="modalWrap" role="dialog" aria-modal="true" aria-labelledby="resTitle">
+    <div class="modal">
+      <h2 id="resTitle">Your Result</h2>
+      <div class="score-big" id="finalScore">0 / 0</div>
+      <div id="resTags"></div>
+      <p id="resMsg" style="margin-top:10px"></p>
+      <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap">
+        <button class="btn" id="reviewFromModal">Review Answers</button>
+        <button class="btn secondary" id="retry">Retry</button>
+        <button class="btn ghost" id="closeModal">Close</button>
+      </div>
+    </div>
+  </div>
+  <button id="go-back" style="width:10%;">Go back!</button>
+
+
+<script>
+/** =============================
+ *  MCQ DATA — edit/add easily
+ *  Each item: { q, options[], answer (index), explanation }
+ *  ============================= */
+const QUESTIONS = [
+  {
+    q: "Standard hotel check-in and check-out times are usually:",
+    options: ["12:00 PM & 10:00 AM","2:00 PM & 11:00 AM","3:00 PM & 9:00 AM","Anytime — 24/7"],
+    answer: 1,
+    explanation: "Many hotels follow 2:00 PM check-in and 11:00 AM check-out to allow housekeeping turnover."
+  },
+  {
+    q: "Which is typically considered a guaranteed reservation?",
+    options: ["Walk-in booking","Reservation with credit card guarantee","Phone enquiry with no details","Waitlisted request"],
+    answer: 1,
+    explanation: "A credit-card-guaranteed reservation ensures the room is held even for late arrival."
+  },
+  {
+    q: "Complimentary breakfast usually includes:",
+    options: ["Unlimited room service meals","Breakfast items in the restaurant or buffet","Mini-bar at no cost","Dinner on the house"],
+    answer: 1,
+    explanation: "Complimentary breakfast applies to breakfast service only, not room service or other meals."
+  },
+  {
+    q: "OTA stands for:",
+    options: ["On-Time Arrival","Online Travel Agency","Overseas Tourism Authority","Order To Accommodation"],
+    answer: 1,
+    explanation: "OTA = Online Travel Agency (e.g., Booking.com, Expedia)."
+  },
+  {
+    q: "What document is most important at check-in?",
+    options: ["Guest’s social media","Government ID/passport","Business card","Gym membership"],
+    answer: 1,
+    explanation: "Valid government ID/passport is required to verify identity and for compliance."
+  },
+  {
+    q: "A no-show is when a guest:",
+    options: ["Arrives early","Cancels on time","Does not arrive and fails to cancel","Requests late checkout"],
+    answer: 2,
+    explanation: "No-show: guest doesn’t arrive and hasn’t cancelled within policy window."
+  },
+  {
+    q: "Which amenity is most often complimentary?",
+    options: ["High-speed Wi-Fi","Private airport transfer","Spa treatment","Mini-bar snacks"],
+    answer: 0,
+    explanation: "Wi-Fi is commonly offered free across the property."
+  },
+  {
+    q: "Which payment option settles the bill immediately?",
+    options: ["Bill to company (BTC)","Cash/UPI/Card at checkout","Credit bill on hold","Post-stay bank transfer"],
+    answer: 1,
+    explanation: "Paying at checkout (cash/UPI/card) settles dues instantly."
+  },
+  {
+    q: "Late checkout requests are best handled by:",
+    options: ["Ignoring the request","Promising without checking","Checking occupancy & offering options","Charging automatically without consent"],
+    answer: 2,
+    explanation: "Front desk should check occupancy, then confirm available times/fees."
+  },
+  {
+    q: "Which is the safest way to store guest valuables?",
+    options: ["Under the pillow","Window ledge","In-room safe or hotel safe deposit","Bathroom cabinet"],
+    answer: 2,
+    explanation: "Use the in-room safe or front-office safe deposit for valuables."
+  }
+];
+
+// ====== QUIZ SETTINGS ======
+const QUIZ_DURATION_SECONDS = 10 * 60; // 10 minutes
+const SHUFFLE_QUESTIONS = true;
+const SHUFFLE_OPTIONS = true;
+
+// ====== STATE ======
+let order = [...Array(QUESTIONS.length).keys()];
+let idx = 0;
+let answers = Array(QUESTIONS.length).fill(null); // store selected option index
+let score = 0;
+let timeLeft = QUIZ_DURATION_SECONDS;
+let timerId = null;
+let reviewMode = false;
+
+// ====== HELPERS ======
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function formatTime(s){
+  const m = Math.floor(s/60).toString().padStart(2,'0');
+  const sec = (s%60).toString().padStart(2,'0');
+  return `${m}:${sec}`;
+}
+function updateHUD(){
+  document.getElementById('idx').textContent = idx+1;
+  document.getElementById('total').textContent = QUESTIONS.length;
+  document.getElementById('score').textContent = score;
+  document.getElementById('bar').style.width = `${((idx)/QUESTIONS.length)*100}%`;
+  document.getElementById('timer').textContent = formatTime(timeLeft);
+  document.getElementById('reviewBtn').disabled = answers.includes(null);
+}
+
+function render(){
+  const qIndex = order[idx];
+  const q = QUESTIONS[qIndex];
+
+  // Build options mapping when shuffling
+  let optIndices = [...q.options.keys()];
+  if (SHUFFLE_OPTIONS && !reviewMode) shuffle(optIndices);
+
+  const optsWrap = document.getElementById('opts');
+  optsWrap.innerHTML = '';
+
+  const qtext = document.getElementById('qtext');
+  qtext.textContent = q.q;
+
+  const explain = document.getElementById('explain');
+  explain.textContent = q.explanation;
+  explain.classList.remove('show');
+
+  const selected = answers[qIndex];
+
+  optIndices.forEach((oi) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'opt';
+    btn.setAttribute('aria-pressed','false');
+    btn.innerHTML = q.options[oi];
+
+    // Restore selected UI if this option is the chosen one
+    if (selected === oi) btn.classList.add('selected');
+
+    btn.addEventListener('click', ()=>{
+      if (reviewMode) return;
+      answers[qIndex] = oi;
+
+      // Mark selection visually
+      [...optsWrap.children].forEach(c => c.classList.remove('selected'));
+      btn.classList.add('selected');
+
+      // If answer is chosen, show immediate feedback highlight
+      if (oi === q.answer) {
+        btn.classList.add('correct');
+      } else {
+        btn.classList.add('wrong');
+        // also mark the correct one subtly
+        ;[...optsWrap.children].forEach(c=>{
+          if (c.textContent === q.options[q.answer]) c.classList.add('correct');
+        });
+      }
+      // Show explanation
+      explain.classList.add('show');
+
+      // Recompute score (count all correct so far)
+      score = answers.reduce((acc, a, i)=>{
+        if (a === null) return acc;
+        return acc + (a === QUESTIONS[i].answer ? 1 : 0);
+      },0);
+      updateHUD();
+    });
+
+    optsWrap.appendChild(btn);
+  });
+
+  // In review mode: lock, show correctness + explanation
+  if (reviewMode){
+    [...optsWrap.children].forEach((c, i)=>{
+      const text = c.textContent;
+      const realCorrect = q.options[q.answer];
+      const chosenIndex = answers[qIndex];
+      c.classList.remove('selected');
+      if (text === q.options[chosenIndex]) c.classList.add('selected');
+      if (text === realCorrect) c.classList.add('correct');
+      if (text !== realCorrect && text === q.options[chosenIndex]) c.classList.add('wrong');
+    });
+    explain.classList.add('show');
+  }
+
+  updateHUD();
+}
+
+function startTimer(){
+  timerId = setInterval(()=>{
+    timeLeft--;
+    document.getElementById('timer').textContent = formatTime(timeLeft);
+    if (timeLeft<=0){
+      clearInterval(timerId);
+      submitQuiz(true);
+    }
+  },1000);
+}
+
+function submitQuiz(auto=false){
+  // if unanswered, keep them as incorrect
+  score = answers.reduce((acc, a, i)=> acc + (a===QUESTIONS[i].answer ? 1:0), 0);
+  const total = QUESTIONS.length;
+  const pct = Math.round((score/total)*100);
+
+  document.getElementById('finalScore').textContent = `${score} / ${total}`;
+  const tags = document.getElementById('resTags');
+  tags.innerHTML = `
+    <span class="tag">Accuracy: ${pct}%</span>
+    <span class="tag">Answered: ${answers.filter(a=>a!==null).length}/${total}</span>
+    <span class="tag">Time ${auto?'(auto-submitted)': ''}: ${formatTime(QUIZ_DURATION_SECONDS-timeLeft)}</span>
+  `;
+  const resMsg = document.getElementById('resMsg');
+  resMsg.textContent =
+    pct>=85 ? "Outstanding! You really know your hospitality basics." :
+    pct>=70 ? "Great job! A little polish and you’ll ace it." :
+    pct>=50 ? "Not bad—review the explanations and try again." :
+              "Keep practicing. Review answers to learn quickly.";
+
+  document.getElementById('modalWrap').style.display='grid';
+  clearInterval(timerId);
+}
+
+function resetQuiz(){
+  order = [...Array(QUESTIONS.length).keys()];
+  if (SHUFFLE_QUESTIONS) shuffle(order);
+  answers = Array(QUESTIONS.length).fill(null);
+  idx = 0; score = 0; reviewMode = false;
+  timeLeft = QUIZ_DURATION_SECONDS;
+  clearInterval(timerId);
+  startTimer();
+  render();
+}
+
+// ====== EVENTS ======
+document.getElementById('prev').addEventListener('click', ()=>{
+  idx = Math.max(0, idx-1); render();
+});
+document.getElementById('next').addEventListener('click', ()=>{
+  idx = Math.min(QUESTIONS.length-1, idx+1); render();
+});
+document.getElementById('submitBtn').addEventListener('click', ()=> submitQuiz(false));
+document.getElementById('reviewBtn').addEventListener('click', ()=>{
+  reviewMode = true;
+  document.getElementById('reviewBtn').disabled = false;
+  render();
+});
+document.getElementById('closeModal').addEventListener('click', ()=>{
+  document.getElementById('modalWrap').style.display='none';
+});
+document.getElementById('retry').addEventListener('click', ()=>{
+  document.getElementById('modalWrap').style.display='none';
+  resetQuiz();
+});
+document.getElementById('reviewFromModal').addEventListener('click', ()=>{
+  document.getElementById('modalWrap').style.display='none';
+  reviewMode = true; render();
+});
+
+// ====== INIT ======
+resetQuiz();
+
+ document.getElementById("go-back").addEventListener("click", () => {
+  history.back();
+});
+</script>
+</body>
+</html>

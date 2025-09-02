@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>Shopsy</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: Arial, sans-serif;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    .typing {
+      font-size: clamp(18px, 4vw, 28px);
+      margin-top: 15px;
+      line-height: 1.5;
+      max-width: 90%;
+      word-wrap: break-word;
+      white-space: normal; /* text multiple lines me aa sake */
+    }
+    .clock {
+      font-size: clamp(20px, 4vw, 40px);
+      padding: 10px 20px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    @media (max-width: 600px) {
+      .clock {
+        font-size: 18px;
+        padding: 8px 16px;
+        bottom: 10px;
+        right: 10px;
+      }
+    }
+
+
+    .container {
+      position: relative; 
+      width: 100%;
+      height: 100%;
+     
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      z-index: 1;
+    }
+
+    .bg-image {
+      position: absolute;
+      z-index: 0;
+      opacity: 0.3;
+      animation: float 5s ease-in-out infinite alternate;
+      transition: transform 1s ease;
+    }
+
+    .bg-top {
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+    }
+
+    .bg-bottom {
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+    }
+
+    .bg-left {
+      left: 0;
+      top: 40%;
+      transform: translateY(-50%);
+      height: 400px;
+    }
+
+    .bg-right {
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 300px;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        transform: translateY(-10px) scale(1.09);
+      }
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      margin-bottom:18%;
+      margin-left:-5%;
+    }
+
+    .content h1 {
+      font-size: 3em;
+    }
+@property --＠color-1 {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: hsl(98 100% 62%);
+}
+
+@property --＠color-2 {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: hsl(204 100% 59%);
+}
+
+/* keyframes that change the color variable */
+@keyframes gradient-change {
+  to {
+    --＠color-1: hsl(210 100% 59%);
+    --＠color-2: hsl(310 100% 59%);
+  }
+}
+
+article {
+  /* apply variable changes over time */
+  animation: gradient-change 2s linear infinite alternate;
+  
+  background: linear-gradient(
+    /* 
+      in oklch produces more vibrant gradient results 
+      learn more https://developer.chrome.com/docs/css-ui/access-colors-spaces#color_interpolation
+    */
+    to right in oklch, 
+    /* use the variables in a gradient (or wherever!) */
+    var(--＠color-1), 
+    var(--＠color-2)
+  );
+  
+  /* old browser support */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  /* modern browser version */
+  background-clip: text;
+  color: transparent;
+}
+
+@layer demo.support {
+  h1 {
+    font-size: 10vmin;
+    line-height: 1.1;
+  }
+
+  h1, p, body {
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  h1 {
+    line-height: 1.25cap;
+  }
+
+  p {
+    font-family: "Dank Mono", ui-monospace, monospace;
+  }
+
+  html {
+    block-size: 100%;
+  }
+
+  article {
+    display: grid;
+    gap: 1lh;
+    text-align: center;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Background Images -->
+    <img src="roof.jpeg" alt="Top" class="bg-image bg-top">
+    <img src="landscape.jpeg" alt="Bottom" class="bg-image bg-bottom">
+    <img src="room.jpeg" alt="Left" class="bg-image bg-left">
+    <img src="mountain.jpeg" alt="Right" class="bg-image bg-right">
+    <img src="pool.jpeg" alt="Center" class="bg-image bg-center">
+
+    <!-- Foreground Content -->
+<div class="art" style="position:absolute; margin-left:-53%;margin-top:-10%;">
+<article style="margin-bottom:15%;">
+  <h1>AryadutaBali <br>(Kuta)</h1>
+  <p></p>
+</article>
+</div>
+    
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <ul>
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="about.html">📄 About</a></li>
+      <li><a href="form.html">📄 Form</a></li>
+      <li><a href="help.html">⚙ Services</a></li>
+      <li><a href="contact.html">📞 Contact</a></li>
+    </ul>
+  </div>
+
+  <!-- Toggle button -->
+  <div class="toggle-btn" id="toggleBtn">☰</div>
+
+  <!-- Typing Animation -->
+  <div class="typing" id="typing"></div>
+
+  <!-- Clock -->
+  <div class="clock" id="clock"></div>
+
+  <script>
+    // Typing effect
+     const texts = [
+      "Offers complimentary parking and 24-hour shuttle services to and from the airport. ",
+     "Features a Grand Ballroom, meeting spaces, and the 220-seat Heavens Wedding Chapel. ✨",
+      " Wedding Services:The 220-seat Heavens Wedding Chapel is available for weddings, exhibitions, and other gatherings.😎",
+    ];
+
+    let count = 0;
+    let index = 0;
+    let currentText = "";
+    let letter = "";
+
+    function type() {
+      if (count === texts.length) {
+        count = 0;
+      }
+      currentText = texts[count];
+      letter = currentText.slice(0, ++index);
+
+      document.getElementById("typing").textContent = letter;
+
+      if (letter.length === currentText.length) {
+        count++;
+        index = 0;
+        setTimeout(type, 800); // pause before next text
+      } else {
+        setTimeout(type, 100);
+      }
+    }
+
+    type();
+
+    // Clock
+    function updateClock() {
+      let now = new Date();
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      let seconds = now.getSeconds();
+      let ampm = hours >= 12 ? "PM" : "AM";
+
+      hours = hours % 12 || 12;
+      minutes = minutes < 10 ? "0" + minutes : minutes;
+      seconds = seconds < 10 ? "0" + seconds : seconds;
+
+      document.getElementById("clock").textContent =
+        hours + ":" + minutes + ":" + seconds + " " + ampm;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Sidebar toggle
+    const toggleBtn = document.getElementById('toggleBtn');
+    const sidebar = document.getElementById('sidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+  </script>
+</body>
+</html>
