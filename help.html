@@ -1,0 +1,285 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <link rel="stylesheet" type="text/css" href="style.css">  
+  <title>Luxury Hotel Profile</title>  
+  <style>  
+    body {  
+      
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;  
+      padding: 0;  
+      color: #333;  
+    
+    }  
+
+    /* ========== ABOUT SECTION ========== */  
+    .about-section {  
+      display: flex;  
+      flex-wrap: wrap;  
+      align-items: center;  
+      justify-content: center;  
+      padding: 80px 10%;  
+      background: linear-gradient(135deg, #f8f5f0, #ffffff);  
+      margin-top: 100px;   /* ✅ fixed: removed inline 35% */  
+    }  
+
+    .about-image {  
+      flex: 1 1 45%;  
+      text-align: center;  
+      padding: 20px;  
+      transform: translateX(-100px);  
+      opacity: 0;  
+      transition: all 1s ease;  
+    }  
+
+    .about-image img {  
+      width: 100%;  
+      max-width: 500px;  
+      border-radius: 20px;  
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);  
+    }  
+
+    .about-content {  
+      flex: 1 1 45%;  
+      padding: 20px;  
+      transform: translateX(100px);  
+      opacity: 0;  
+      transition: all 1s ease;  
+    }  
+
+    .about-content h2 {  
+      font-size: clamp(1.8rem, 4vw, 2.8rem);  
+      margin-bottom: 20px;  
+      color: #2c3e50;  
+      position: relative;  
+    }  
+
+    .about-content h2::after {  
+      content: "";  
+      width: 80px;  
+      height: 4px;  
+      background: #c19a6b; /* golden luxury touch */  
+      display: block;  
+      margin-top: 10px;  
+      border-radius: 2px;  
+    }  
+
+    .about-content p {  
+      font-size: 1rem;  
+      line-height: 1.7;  
+      margin-bottom: 20px;  
+      color: #555;  
+    }  
+
+    .about-content .btn {  
+      display: inline-block;  
+      padding: 12px 28px;  
+      background: #c19a6b;  
+      color: #fff;  
+      font-weight: 600;  
+      border-radius: 30px;  
+      text-decoration: none;  
+      transition: all 0.3s ease;  
+      box-shadow: 0 4px 12px rgba(193,154,107,0.4);  
+    }  
+
+    .about-content .btn:hover {  
+      background: #a97c4f;  
+      box-shadow: 0 6px 16px rgba(193,154,107,0.6);  
+      transform: translateY(-3px);  
+    }  
+
+    /* ========== SERVICES SECTION ========== */  
+    .services-section {  
+      padding: 80px 10%;  
+      background: #fff;  
+      text-align: center;  
+    }  
+
+    .services-section h2 {  
+      font-size: clamp(1.8rem, 4vw, 2.6rem);  
+      margin-bottom: 10px;  
+      color: #2c3e50;  
+    }  
+
+    .services-section h2::after {  
+      content: "";  
+      width: 80px;  
+      height: 4px;  
+      background: #c19a6b;  
+      display: block;  
+      margin: 12px auto;  
+      border-radius: 2px;  
+    }  
+
+    .services-grid {  
+      display: grid;  
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));  
+      gap: 25px;  
+      margin-top: 50px;  
+    }  
+
+    .service-item {  
+      background: #f8f8f8;  
+      border-radius: 18px;  
+      padding: 30px 20px;  
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);  
+      transition: all 0.5s ease;  
+      transform: translateY(50px);  
+      opacity: 0;  
+    }  
+
+    .service-item img {  
+      width: 80px;  
+      margin-bottom: 20px;  
+    }  
+
+    .service-item h3 {  
+      font-size: 1.4rem;  
+      margin-bottom: 12px;  
+      color: #2c3e50;  
+    }  
+
+    .service-item p {  
+      font-size: 0.95rem;  
+      color: #555;  
+      line-height: 1.6;  
+    }  
+
+    .service-item:hover {  
+      transform: translateY(-10px);  
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);  
+    }  
+
+    /* Animation Active State */  
+    .active {  
+      opacity: 1 !important;  
+      transform: translate(0) !important;  
+    }  
+
+    /* Responsive Fixes */  
+    @media (max-width: 900px) {  
+      .about-section {  
+        flex-direction: column;  
+        text-align: center;  
+        padding: 50px 20px;  
+      }  
+      .about-image, .about-content {  
+        flex: 1 1 100%;  
+        transform: none;  
+        opacity: 1; /* ✅ show immediately */  
+      }  
+      .about-content h2 {  
+        font-size: 2rem;  
+      }  
+    }  
+
+    @media (max-width: 600px) {  
+      .services-section {  
+        padding: 50px 20px;  
+      }  
+      .service-item {  
+        padding: 20px 15px;  
+      }  
+      .service-item h3 {  
+        font-size: 1.2rem;  
+      }  
+      .service-item p {  
+        font-size: 0.9rem;  
+      }  
+    }  
+  </style>  
+</head>  
+<body>  
+
+  <!-- Sidebar -->  
+  <div class="sidebar" id="sidebar">  
+    <ul>  
+      <li><a href="index.html">🏠 Home</a></li>  
+      <li><a href="about.html">📄 About</a></li>  
+      <li><a href="form.html">📄 Form</a></li>  
+      <li><a href="help.html">⚙ Services</a></li>  
+      <li><a href="contact.html">📞 Contact</a></li>  
+    </ul>  
+  </div>  
+
+  <!-- Toggle button -->  
+  <div class="toggle-btn" id="toggleBtn">☰</div>  
+
+  <!-- ========== ABOUT ========== -->  
+  <section class="about-section">  
+    <div class="about-image reveal-left">  
+      <img src="roof.jpeg" alt="Luxury Hotel">  
+    </div>  
+    <div class="about-content reveal-right">  
+      <h2>Welcome to Luxury Hotel</h2>  
+      <p>  
+        Experience unmatched luxury and comfort at the Royal Grand Hotel.    
+        Nestled in the heart of the city, we offer world-class hospitality,    
+        exquisite dining, and premium suites designed to provide an unforgettable stay.  
+      </p>  
+      <p>  
+        With elegant interiors, spa & wellness centers, and personalized services,    
+        every moment at our hotel is crafted for your comfort and relaxation.  
+      </p>  
+      <a href="https://balihoneymoon.com/stay/most-luxurious-hotels-bali/" class="btn">Explore More</a>  
+    </div>  
+  </section>  
+
+  <!-- ========== SERVICES ========== -->  
+  <section class="services-section">  
+    <h2>Our Services</h2>  
+    <div class="services-grid">  
+      <div class="service-item reveal-up">  
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="Luxury Rooms">  
+        <h3>Luxury Rooms</h3>  
+        <p>Elegant suites with premium interiors, city views, and personalized comfort.</p>  
+      </div>  
+      <div class="service-item reveal-up">  
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075974.png" alt="Fine Dining">  
+        <h3>Fine Dining</h3>  
+        <p>World-class cuisines crafted by top chefs, offering a royal dining experience.</p>  
+      </div>  
+      <div class="service-item reveal-up">  
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075971.png" alt="Spa & Wellness">  
+        <h3>Spa & Wellness</h3>  
+        <p>Relax and rejuvenate at our luxury spa and wellness centers.</p>  
+      </div>  
+      <div class="service-item reveal-up">  
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075975.png" alt="Events & Meetings">  
+        <h3>Events & Meetings</h3>  
+        <p>Host weddings, events, or conferences in our premium venues.</p>  
+      </div>  
+    </div>  
+  </section>  
+
+  <script>  
+    // Sidebar toggle  
+    const toggleBtn = document.getElementById('toggleBtn');  
+    const sidebar = document.getElementById('sidebar');  
+    toggleBtn.addEventListener('click', () => {  
+      sidebar.classList.toggle('active');  
+    });  
+
+    // Scroll animation  
+    const reveals = document.querySelectorAll(".reveal-left, .reveal-right, .reveal-up");  
+    function revealOnScroll() {  
+      const triggerBottom = window.innerHeight * 0.85;  
+      reveals.forEach(el => {  
+        const boxTop = el.getBoundingClientRect().top;  
+        if (boxTop < triggerBottom) {  
+          el.classList.add("active");  
+        }  
+      });  
+    }  
+    window.addEventListener("scroll", revealOnScroll);  
+    window.addEventListener("load", revealOnScroll);  
+  </script>  
+
+</body>  
+</html>
